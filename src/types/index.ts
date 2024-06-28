@@ -1,28 +1,37 @@
-type payment = "Онлайн | При получении"
-type cardPreview = Pick<Card, "categoty" | "name" | "text" | "price">;
-type basketList = Pick<Card, "id" | "name" | "price">;
-
-interface Card {
+export interface ICardProduct {
     id: string;
-    name: string;
-    text: string;
-    link: string;
+    image: string;
     price: number | null;
-    categoty: string;
+    category: string;
+    description: string;
+	title: string;
 }
 
-interface CardList {
-    total: number;
-    cards: Card[];
+export interface IOrder {
+	payment: string;
+	email: string;
+	phone: string;
+	address: string;
+	items: string[];
+	total: number;
 }
 
-interface UserContacts {
-    adress: string;
-    email: string;
-    phone: string;
+export interface IOrderForm {
+	payment: string;
+	addressInput: HTMLInputElement;
+	paymentCardButton: HTMLButtonElement;
+    paymentCashButton: HTMLButtonElement;
+	address: string;
 }
 
-interface Basket {
-    items: Map<string, number>;
-    sum: number;
+export interface IOrderResult {
+	id: string;
+	total: number;
+}
+  
+export interface IAppState {
+	catalog: ICardProduct[];
+	basket: ICardProduct[];
+	preview: ICardProduct | null;
+	order: IOrder;
 }
