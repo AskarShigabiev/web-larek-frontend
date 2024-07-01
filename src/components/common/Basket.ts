@@ -46,7 +46,7 @@ export class Basket extends Component<IBasketView> {
         }
         const itemIndexElements: HTMLElement[] = ensureAllElements<HTMLElement>('.basket__item-index', this._basketList);
         itemIndexElements.forEach((element, index) => {
-            element.textContent = String(index + 1);
+            this.setText(element, index + 1);
         });
     }
 

@@ -75,11 +75,9 @@ events.on('card:select', (item: ICardProduct) => {
     const card = new Card(
         cloneTemplate(cardPreviewTemplate), { 
             onClick: () => events.emit(actionType, item) 
-        }, { 
-            onClick: () => events.emit(actionType, item) 
         }, 
-            buttonText
-        );
+        buttonText
+    );
 
     renderModal(card.render({
         title: item.title,
@@ -92,22 +90,24 @@ events.on('card:select', (item: ICardProduct) => {
 
 // Открытие модального окна корзины
 events.on('basket:open', () => {
+    renderModal(basket.render());
+});
+
+// Обновление данных корзины
+events.on('basket:change', () => {
     basket.setPrice(appData.sumPriceInBasket(), appData.checkPriceOfProducts());
     basket.basketList = appData.basket.map((item: ICardProduct) => {
         const card = new Card(cloneTemplate(cardBasketTemplate), {
-            onClick: () => {
-                events.emit('card:remove', item);
-                events.emit('basket:open');
-            }
+            onClick: () => events.emit('card:remove', item)
         });
-    
+
         return card.render({
             title: item.title,
             price: item.price
         });
     });
     basket.toggleButton(appData.counterBasket() === 0 || appData.checkPriceOfProducts());
-    renderModal(basket.render());
+    page.counter = appData.counterBasket();
 });
 
 // Открытие модального окна заказа
@@ -130,15 +130,17 @@ events.on('order:submit', () => {
     contacts.valid = appData.validateOrder();
 });
 
-// Открытие модального окна подтверждения заказа
+// Открытие модального окна подтверждения заказа !!!
 events.on('success:open', (result: { id: string, total: number }) => {
     events.emit('delete:all');
     success.total = result.total;
-    renderModal(success.render());
+    modal.render({
+        content: success.render(),
+    });// !!!
 });
 
 // Если в корзине или поменялись значения
-events.on(/^order||contacts\..*:change/, () => {   
+events.on(/^order|contacts\..*:change/, () => {   
     appData.payment = order.payment; 
     appData.address = order.getAddressInputValue();
     appData.email = contacts.getEmail();
@@ -153,18 +155,15 @@ events.on('card:add', (item: ICardProduct) => {
         appData.addToBasket(item);
         events.emit('basket:change');
         modal.close();
-        
+
         const cardElement = document.querySelector(`[data-id="${item.id}"]`);
         if (cardElement) {
-            const card = new Card(cardElement as HTMLElement);
-            card.buttonText = 'Удалить';
+            const button = cardElement.querySelector('.card__button') as HTMLButtonElement;
+            if (button) {
+                button.textContent = 'Удалить';
+            }
         }
     }
-});
-
-// Подсчет товара в корзине на главной странице
-events.on('basket:change', () => {
-    page.counter = appData.counterBasket();
 });
 
 // Убрать товар из корзины
@@ -172,6 +171,14 @@ events.on('card:remove', (item: ICardProduct) => {
     appData.removeFromBasket(item);
     events.emit('basket:change');
     modal.close();
+
+    const cardElement = document.querySelector(`[data-id="${item.id}"]`);
+    if (cardElement) {
+        const button = cardElement.querySelector('.card__button') as HTMLButtonElement;
+        if (button) {
+            button.textContent = 'Добавить';
+        }
+    }
 });
 
 // Отправка заказа
@@ -193,12 +200,12 @@ events.on('delete:all', () => {
     events.emit('basket:change');
 });
 
-// Блокируем прокрутку страницы если открыта модалка
+// Блокируем прокрутку страницы, если открыта модалка
 events.on('modal:open', () => {
     page.locked = true;
 });
 
-// ... и разблокируем
+// Разблокируем прокрутку страницы
 events.on('modal:close', () => {
     page.locked = false;
 });

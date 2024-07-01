@@ -22,17 +22,6 @@ export class Success extends Component<ISuccess> {
     }
 
     set total(total: number) {
-        const textTotal = `Списано ${total} синапсов`;
-        this.setText(this._total, textTotal);
+        this._total.textContent = ('Списано '+ String(total) + ' синапсов');
     }
-
-    setText(item: HTMLElement, value: string) {
-        if (item) {
-            item.textContent = value;
-        }
-    }
-
-    render() {
-        return this._total; 
-    }
-} 
+}

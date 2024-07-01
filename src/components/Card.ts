@@ -16,7 +16,7 @@ export class Card extends Component<ICardProduct> {
   protected _button: HTMLButtonElement;
   protected _categoryList = categoryList;
 
-  constructor(container: HTMLElement, actions?: ICardActions, buttonActions?: ICardActions, buttonTextAdded?: string) {
+  constructor(container: HTMLElement, actions?: ICardActions, buttonTextAdded?: string) {
     super(container);
 
     this._title = ensureElement<HTMLElement>('.card__title', container);
@@ -46,12 +46,8 @@ export class Card extends Component<ICardProduct> {
       container.addEventListener('click', actions.onClick);
     }
     
-    if (buttonActions?.onClick && this._button) {
-        if (buttonTextAdded) {
-            this._button.textContent = buttonTextAdded;
-        }
-        this._button.removeEventListener('click', buttonActions.onClick);
-        this._button.addEventListener('click', buttonActions.onClick);
+    if (this._button && buttonTextAdded) {
+        this.buttonText = buttonTextAdded;
     }
   }
 
@@ -60,40 +56,33 @@ export class Card extends Component<ICardProduct> {
   }
 
   set image(value: string) {
-    if (this._image) {
-      this.setImage(this._image, value, this._title.textContent || '');
-    }
+    this.setImage(this._image, value, this._title.textContent || '');
   }
 
   set category(value: string) {
-    if (this._category) {
-      this.setText(this._category, value);
-      this._category.className = `card__category card__category_${this._categoryList[value]}`;
-    }
+    this.setText(this._category, value);
+    this._category.className = `card__category card__category_${this._categoryList[value]}`;
   }
 
   set price(value: number) {
     this.setText(this._price, value === null ? 'Бесценно' : `${value} синапсов`);
+    this._button.disabled = value === null;  // Если цена не указана, то кнопка добавления блокируется
   }
 
   set buttonText(value: string) {
-    if (this._button) {
-        this._button.textContent = value;
-    }
+    this.setText(this._button, value);
   }
 
-  set description(value: string) {
-    if (this._description) {
-      if (Array.isArray(value)) {
-        this._description.innerHTML = '';
-        value.forEach(str => {
-          const descElement = document.createElement('p');
-          this.setText(descElement, str);
-          this._description!.appendChild(descElement);
-        });
-      } else {
-        this.setText(this._description, value);
-      }
-    } 
+  set description(value: string | string[]) {
+    if (Array.isArray(value)) {
+      this._description.innerHTML = '';
+      value.forEach(str => {
+        const descElement = document.createElement('p');
+        this.setText(descElement, str);
+        this._description.appendChild(descElement);
+      });
+    } else {
+      this.setText(this._description, value);
+    }
   }
 }
