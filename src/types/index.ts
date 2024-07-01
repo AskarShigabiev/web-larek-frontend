@@ -5,6 +5,7 @@ export interface ICardProduct {
     category: string;
     description: string;
 	title: string;
+	buttonText?: string;
 }
 
 export interface IOrder {
