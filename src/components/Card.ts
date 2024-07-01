@@ -66,7 +66,6 @@ export class Card extends Component<ICardProduct> {
 
   set price(value: number) {
     this.setText(this._price, value === null ? 'Бесценно' : `${value} синапсов`);
-    this._button.disabled = value === null;  // Если цена не указана, то кнопка добавления блокируется
   }
 
   set buttonText(value: string) {
