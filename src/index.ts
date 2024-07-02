@@ -150,7 +150,7 @@ events.on(/^order|contacts\..*:change/, () => {
 });
 
 // Обновления текста кнопки
-events.on('card:change', (item: ICardProduct) => {
+events.on('basket:onchange', (item: ICardProduct) => {
     const cardElement = document.querySelector(`[data-id="${item.id}"]`);
     if (cardElement) {
         const button = cardElement.querySelector('.card__button') as HTMLButtonElement;
@@ -168,19 +168,19 @@ events.on('card:add', (item: ICardProduct) => {
         modal.close();
 
         const updatedItem = { ...item, buttonText: 'Удалить' };
-        events.emit('card:change', updatedItem);
+        events.emit('basket:onchange', updatedItem);
     }
 });
 
 // Убрать товар из корзины
-events.on('card:add', (item: ICardProduct) => {
-    if (!appData.checkItemInBasket(item)) {
-        appData.addToBasket(item);
+events.on('card:remove', (item: ICardProduct) => {
+    if (appData.checkItemInBasket(item)) {
+        appData.removeFromBasket(item);
         events.emit('basket:change');
         modal.close();
 
         const updatedItem = { ...item, buttonText: 'Добавить' };
-        events.emit('card:change', updatedItem);
+        events.emit('basket:onchange', updatedItem);
     }
 });
 
